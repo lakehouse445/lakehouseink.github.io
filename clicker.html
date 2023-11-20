@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clicker Game</title>
+    <style>
+        #clicker {
+            width: 100px;
+            height: 100px;
+            background-color: #f00;
+            margin: auto;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        #clickCounter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #upgradeButton, #clickPowerUpgradeButton {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+        }
+        #clickPowerUpgradeButton {
+            top: 80px;
+        }
+        #message {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: red;
+        }
+        #achievementsBoard {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: 1px solid #000;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="clicker"></div>
+    <div id="clickCounter">0</div>
+    <button id="upgradeButton">CPS Upgrade (cost: 0)</button>
+    <button id="clickPowerUpgradeButton">Click Power Upgrade (cost: 0)</button>
+    <div id="message"></div>
+    <div id="achievementsBoard"></div>
+    <script src="game.js"></script>
+</body>
+<script>
+// game.js
+let clickCount = 0;
+let cps = 0; // clicks per second
+let clickPower = 1; // clicks gained per click
+let cpsUpgradeLevel = 0;
+let clickPowerUpgradeLevel = 0;
+
+document.getElementById('clicker').addEventListener('click', function() {
+    clickCount += clickPower;
+    document.getElementById('clickCounter').innerText = clickCount;
+    if (clickCount === clickPower) {
+        unlockAchievement('First!!1!1');
+    }
+    if (clickCount === 100) {
+        unlockAchievement('Clickarooo');
+    }
+});
+
+setInterval(function() {
+    clickCount += cps;
+    document.getElementById('clickCounter').innerText = clickCount;
+    document.getElementById('upgradeButton').innerText = 'CPS Upgrade (cost: ' + 8 * Math.pow(2, cpsUpgradeLevel) + ')';
+    document.getElementById('clickPowerUpgradeButton').innerText = 'Click Power Upgrade (cost: ' + 10 * Math.pow(2, clickPowerUpgradeLevel) + ')';
+    if (cps >= 12) {
+        unlockAchievement('CPS Master');
+    }
+    if (clickPower >= 10) {
+        unlockAchievement('Click Power Master');
+    }
+}, 500); // update every half-second
+
+document.getElementById('upgradeButton').addEventListener('click', function() {
+    buyCPSUpgrade();
+});
+
+document.getElementById('clickPowerUpgradeButton').addEventListener('click', function() {
+    buyClickPowerUpgrade();
+});
+
+function buyCPSUpgrade() {
+    let upgradeCost =  8 * Math.pow(2, cpsUpgradeLevel);
+    if (clickCount >= upgradeCost) {
+        clickCount -= upgradeCost;
+        cps++;
+        cpsUpgradeLevel++;
+        if (cpsUpgradeLevel === 10) {
+            unlockAchievement('CPS Upgrade Master');
+        }
+    } else {
+        showMessage('You need ' + (upgradeCost - clickCount) + ' more clicks');
+    }
+}
+
+function buyClickPowerUpgrade() {
+    let upgradeCost =  10 * Math.pow(2, clickPowerUpgradeLevel);
+    if (clickCount >= upgradeCost) {
+        clickCount -= upgradeCost;
+        clickPower++;
+        clickPowerUpgradeLevel++;
+        if (clickPowerUpgradeLevel === 10) {
+            unlockAchievement('Click Power Upgrade Master');
+        }
+    } else {
+        showMessage('You need ' + (upgradeCost - clickCount) + ' more clicks');
+    }
+}
+
+function showMessage(text) {
+    document.getElementById('message').innerText = text;
+    setTimeout(function() {
+        document.getElementById('message').innerText = '';
+    }, 2000); // message disappears after 2 seconds
+}
+
+function unlockAchievement(name) {
+    if (document.getElementById(name)) {
+        return; // This achievement has already been unlocked
+    }
+    let achievementDiv = document.createElement('div');
+    achievementDiv.id = name;
+    achievementDiv.innerText = name;
+    document.getElementById('achievementsBoard').appendChild(achievementDiv);
+    document.getElementById('achievementMessage').innerText = 'Achievement unlocked: ' + name;
+    setTimeout(function() {
+        document.getElementById('achievementMessage').innerText = '';
+    }, 3000); // achievement message disappears after 3 seconds
+}
+
+</script>
+</html>
